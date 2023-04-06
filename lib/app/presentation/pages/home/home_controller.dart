@@ -1,32 +1,13 @@
-import 'package:to_do_list/app/domain/entities/task_entity.dart';
-import 'package:to_do_list/app/domain/usecases/to_do_list_usecase.dart';
+import 'package:to_do_list/app/presentation/pages/home/home_store.dart';
 
 class HomeController {
-  final ToDoListUsecase getUsecase;
-  final ToDoListUsecase updateUsecase;
+  final HomeStore store;
 
   HomeController({
-    required this.updateUsecase,
-    required this.getUsecase,
+    required this.store,
   });
 
-  List<TaskEntity> currentList = [];
-
-  void fetch() {
-    currentList = getUsecase.call();
-  }
-
-  void markOrDesmarkTask(bool b, int index) {
-    final currentTask = currentList[index];
-
-    final task = TaskEntity(
-      id: currentTask.id,
-      done: b,
-      description: currentTask.description,
-    );
-
-    if (updateUsecase.call(params: task)) {
-      currentList[index] = task;
-    }
+  void dispose() {
+    store.destroy();
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:to_do_list/app/domain/repositories/to_do_list_repository.dart';
-import 'package:to_do_list/app/domain/usecases/create_task_usecase.dart';
+import 'package:to_do_list/app/domain/usecases/create/create_task_usecase_imp.dart';
 import 'package:to_do_list/app/presentation/pages/record/record_controller.dart';
 
 class RecordPage extends StatefulWidget {
@@ -23,7 +23,7 @@ class _RecordPageState extends State<RecordPage> {
     super.initState();
 
     controller = RecordController(
-      createUsecase: CreateTaskUsecase(
+      createUsecase: CreateTaskUsecaseImp(
         repository: widget.repository,
       ),
     );

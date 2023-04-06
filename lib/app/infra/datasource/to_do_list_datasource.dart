@@ -1,9 +1,9 @@
 import 'package:to_do_list/app/domain/entities/task_entity.dart';
 
-abstract class ToDoListRepository {
-  Future<List<TaskEntity>> get();
+abstract class ToDoListDatasource {
   Future<bool> create(TaskEntity task);
-  Future<bool> update(TaskEntity task);
+  Future<List<TaskEntity>> get();
   Future<bool> markOrDemark(String id, bool flag);
+  Future<bool> update(TaskEntity task);
   Future<bool> removeAt(String id);
 }

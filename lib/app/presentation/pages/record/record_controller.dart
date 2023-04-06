@@ -1,5 +1,5 @@
 import 'package:to_do_list/app/domain/entities/task_entity.dart';
-import 'package:to_do_list/app/domain/usecases/create_task_usecase.dart';
+import 'package:to_do_list/app/domain/usecases/create/create_task_usecase.dart';
 import 'package:uuid/uuid.dart';
 
 class RecordController {
@@ -15,13 +15,13 @@ class RecordController {
     currentDescription = s;
   }
 
-  save() {
+  save() async {
     final task = TaskEntity(
       id: const Uuid().v4(),
       done: false,
       description: currentDescription,
     );
 
-    createUsecase.call(params: task);
+    await createUsecase.call(task);
   }
 }
