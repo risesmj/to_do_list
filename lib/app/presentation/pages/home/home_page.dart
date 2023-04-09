@@ -1,15 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 import 'package:flutter_triple/flutter_triple.dart';
 import 'package:to_do_list/app/domain/entities/task_entity.dart';
-import 'package:to_do_list/app/domain/repositories/to_do_list_repository.dart';
-import 'package:to_do_list/app/domain/usecases/get/get_list_usecase_imp.dart';
-import 'package:to_do_list/app/domain/usecases/mark/mark_task_usecase_imp.dart';
-import 'package:to_do_list/app/domain/usecases/remove_at/remove_at_usecase_imp.dart';
-import 'package:to_do_list/app/external/datasource/hive/to_do_list_hive_datasource.dart';
-import 'package:to_do_list/app/infra/repositories/to_do_list_repository_imp.dart';
 import 'package:to_do_list/app/presentation/pages/home/home_controller.dart';
 import 'package:to_do_list/app/presentation/pages/home/home_store.dart';
-import 'package:to_do_list/app/presentation/pages/record/record_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -20,30 +14,21 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late final HomeController controller;
-  late final ToDoListRepository repository;
 
   @override
   void initState() {
     super.initState();
-
-    repository = ToDoListRepositoryImp(
-      datasource: ToDoListHiveDatasource(),
-    );
-
-    controller = HomeController(
-        store: HomeStore(
-      removeAtUsecase: RemoveAtUsecaseImp(
-        repository: repository,
-      ),
-      markTaskUsecase: MarkTaskUsecaseImp(
-        repository: repository,
-      ),
-      getUsecase: GetListUsecaseImp(
-        repository: repository,
-      ),
-    ));
-
+    controller = Modular.get();
     controller.store.fetch();
+
+    controller.store.observer(onError: ((error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }));
   }
 
   @override
@@ -59,11 +44,7 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.add),
           onPressed: () async {
-            await Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: ((context) => RecordPage(repository: repository)),
-              ),
-            );
+            await Modular.to.pushNamed('/new');
             controller.store.fetch();
           }),
       body: Center(
@@ -72,10 +53,6 @@ class _HomePageState extends State<HomePage> {
           builder: ((context, triple) {
             if (triple.isLoading) {
               return const CircularProgressIndicator();
-            }
-
-            if (triple.error != null) {
-              return Text(triple.error!);
             }
 
             return ListView.builder(

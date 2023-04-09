@@ -19,12 +19,17 @@ class HomeStore extends StreamStore<String, List<TaskEntity>> {
 
   Future<void> fetch() async {
     setLoading(true);
-    final list = await getUsecase();
-    update(list);
+    try {
+      final list = await getUsecase();
+      update(list);
+    } catch (e) {
+      setError(e.toString());
+    }
     setLoading(false);
   }
 
   void markOrDesmarkTask(bool b, int index) async {
+    setLoading(true);
     final currentTask = state[index];
 
     final task = TaskEntity(
@@ -33,17 +38,27 @@ class HomeStore extends StreamStore<String, List<TaskEntity>> {
       description: currentTask.description,
     );
 
-    if (await markTaskUsecase.call(task.id, b)) {
-      state[index] = task;
-      update(List.from(state));
+    try {
+      if (await markTaskUsecase.call(task.id, b)) {
+        state[index] = task;
+        update(List.from(state));
+      }
+    } catch (e) {
+      setError(e.toString(), force: true);
     }
+
+    setLoading(false);
   }
 
   void removeAt(int index) async {
     final currentTask = state[index];
 
-    if (await removeAtUsecase(currentTask.id)) {
-      fetch();
+    try {
+      if (await removeAtUsecase(currentTask.id)) {
+        fetch();
+      }
+    } catch (e) {
+      setError(e.toString());
     }
   }
 }
